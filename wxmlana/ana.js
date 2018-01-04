@@ -10,8 +10,14 @@ function ana(raw){
                 str+=">";
             }
             if(raw["children"]!=""){
+                
                 for(var k in raw["children"]){
-                    str+=ana(raw["children"][k]);
+                    //console.log(typeof(raw["children"][k]));
+                    if(typeof(raw["children"][k])=="object"){
+                        str+=ana(raw["children"][k]);
+                    }else{
+                        str+=raw["children"][k];
+                    }
                 }
             }
             str+="</"+raw[i]+">";
