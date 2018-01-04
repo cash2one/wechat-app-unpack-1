@@ -2,17 +2,24 @@ function ana(raw){
     var str="";
     for(var i in raw){
         if(i=="tag"){
-            str+="<"+raw[i];
-            if(raw["attr"]!=""){
+            if(raw[i]!="virtual"){
+                str+="<"+raw[i];
+            }
+            if(raw["wx:for-items"]!=undefined){
+                str+=" wx:for-items=\""+raw["wx:for-items"]+"\"";
+            }
+            if(raw["wx:key"]!=undefined){
+                str+=" wx:key=\""+raw["wx:key"]+"\"";
+            }
+            if(raw["attr"]!=undefined){
                 for(var j in raw["attr"]){
                     str+=" "+j+"=\""+raw["attr"][j]+"\"";
                 }
-                str+=">";
             }
-            if(raw["children"]!=""){
+            str+=">";
+            if(raw["children"]!=undefined){
                 
                 for(var k in raw["children"]){
-                    //console.log(typeof(raw["children"][k]));
                     if(typeof(raw["children"][k])=="object"){
                         str+=ana(raw["children"][k]);
                     }else{
@@ -20,7 +27,9 @@ function ana(raw){
                     }
                 }
             }
-            str+="</"+raw[i]+">";
+            if(raw[i]!="virtual"){
+                str+="</"+raw[i]+">";
+            }
         }
     }
     return str;
