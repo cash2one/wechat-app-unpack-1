@@ -52,13 +52,13 @@ var $gwxc=0;
 			var _a,_b,_c,_d, _aa, _bb;
 			switch( rop ){
 				case '?:':
-					console.log(ops);
+					//console.log(ops);
 					_a = rev( ops[1], e, s, g, o );
-					console.log(_a);
+					//console.log(_a);
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? rev( ops[2], e, s, g, o ) : rev( ops[3], e, s, g, o );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
-					console.log( rev( ops[2], e, s, g, o ));
+					//console.log( rev( ops[2], e, s, g, o ));
 					return _d;
 					break;
 				case '&&':
@@ -276,7 +276,7 @@ var $gwxc=0;
 										return wh.rv(_d);
 									}
 								}
-								console.log("{{"+ops[1][1]+"}}");
+								//console.log("{{"+ops[1][1]+"}}");
 								return "{{"+ops[1][1]+"}}";
 						}
 						break;
