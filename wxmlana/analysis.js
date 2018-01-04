@@ -1,7 +1,6 @@
 
 var z=[];
 var $gwxc=0;
-//var should_pass_type_info=true;
 	var root={"tag":"page"};
 	root.children=[]
 	function _(a,b){
@@ -40,7 +39,6 @@ var $gwxc=0;
 			return { __value__: obj, __wxspec__: special ? special : true }
 		},
 		rv: function( obj ){
-			//console.log(this.hn(obj));
 			return this.hn(obj)==='n'?obj:this.rv(obj.__value__);
 		}}
 		return new x;
@@ -58,22 +56,21 @@ var $gwxc=0;
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? rev( ops[2], e, s, g, o ) : rev( ops[3], e, s, g, o );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
-					//console.log( rev( ops[2], e, s, g, o ));
-					return _d;
+					return "{{"+rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","")+"?"+(rev( ops[2], e, s, g, o )!=""?rev( ops[2], e, s, g, o ):"''")+":"+(rev( ops[3], e, s, g, o )!=""?rev( ops[3], e, s, g, o ):"''")+"}}";
 					break;
 				case '&&':
 					_a = rev( ops[1], e, s, g, o );
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? rev( ops[2], e, s, g, o ) : wh.rv( _a );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
-					return _d;
+					return rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","")+"&&"+rev( ops[2], e, s, g, o ).replace("{{","").replace("}}","");
 					break;
 				case '||':
 					_a = rev( ops[1], e, s, g, o );
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? wh.rv(_a) : rev( ops[2], e, s, g, o );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
-					return _d;
+					return rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","")+"||"+rev( ops[2], e, s, g, o ).replace("{{","").replace("}}","");
 					break;
 				case '+':
 				case '*':
@@ -92,8 +89,8 @@ var $gwxc=0;
 				case '<':
 				case '<<':
 				case '>>':
-					_a = rev( ops[1], e, s, g, o );
-					_b = rev( ops[2], e, s, g, o );
+					_a = rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","");
+					_b = rev( ops[2], e, s, g, o ).replace("{{","").replace("}}","");
 					_c = should_pass_type_info && (wh.hn( _a ) === 'h' || wh.hn( _b ) === 'h');
 					switch( rop ){
 						case '+':
@@ -150,38 +147,36 @@ var $gwxc=0;
 						default:
 							break;
 					}
-					return _c ? wh.nh( _d, "c" ) : _d;
+					return ""+_a+rop+_b+"";
 					break;
 				case '-':
 					_a = ops.length === 3 ? rev( ops[1], e, s, g, o ) : 0;
 					_b = ops.length === 3 ? rev( ops[2], e, s, g, o ) : rev( ops[1], e, s, g, o );
 					_c = should_pass_type_info && (wh.hn( _a ) === 'h' || wh.hn( _b ) === 'h');
 					_d = _c ? wh.rv( _a ) - wh.rv( _b ) : _a - _b;
-					return _c ? wh.nh( _d, "c" ) : _d;
+					return ""+_a+rop+_b+"";
 					break;
 				case '!':
-					_a = rev( ops[1], e, s, g, o );
+					_a = rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","");
 					_c = should_pass_type_info && (wh.hn( _a ) == 'h');
 					_d = !wh.rv(_a);
-					return _c ? wh.nh( _d, "c" ) : _d;
+					return ""+rop+_a+"";
 				case '~':
-					_a = rev( ops[1], e, s, g, o );
+					_a = rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","");
 					_c = should_pass_type_info && (wh.hn( _a ) == 'h');
 					_d = ~wh.rv(_a);
-					return _c ? wh.nh( _d, "c" ) : _d;
+					return ""+rop+_a+"";
 					default:
 						$gwn('unrecognized op' + rop );
 			}
 		}
 		function rev( ops, e, s, g, o ){
-			//console.log(ops);
 			var op = ops[0];
 			if( typeof(op)==='object' ){
 				var vop=op[0];
 				var _a, _aa, _b, _bb, _c, _d, _s, _e, _ta, _tb, _td;
 				switch(vop){
 					case 2:
-						console.log(ops);
 						return ArithmeticEv(ops,e,s,g,o);
 						break;
 					case 4:
@@ -246,12 +241,9 @@ var $gwxc=0;
 								return g;
 							case 3:
 								_s = wh.rv( s );
-								console.log(_s);
 								_e = wh.rv( e );
-								console.log(_e);
 								_b = ops[1][1];
-								//_a = _s && _s.hasOwnProperty(_b) ? s : _e && ( _e.hasOwnProperty(_b) ? e : undefined );
-								_a = _s;
+								_a = _s && _s.hasOwnProperty(_b) ? s : _e && ( _e.hasOwnProperty(_b) ? e : undefined );
 								if( should_pass_type_info ){
 									if( _a ){
 										_ta = wh.hn(_a) === 'h';
@@ -260,23 +252,19 @@ var $gwxc=0;
 										_td = wh.hn(_d) === 'h';
 										o.is_affected |= _ta || _td;
 										_d = _ta && !_td ? wh.nh(_d,'e') : _d;
-										console.log(_d);
-										return _d;
+										return ""+ops[1][1]+"";
 									}
 								}
 								else{
 									if( _a ){
-										console.log(_a);
 										_ta = wh.hn(_a) === 'h';
 										_aa = _ta ? wh.rv( _a ) : _a;
 										_d = _aa[_b];
 										_td = wh.hn(_d) === 'h';
 										o.is_affected |= _ta || _td;
-										console.log(wh.rv(_d));
-										return wh.rv(_d);
+										return ""+ops[1][1]+"";
 									}
 								}
-								//console.log("{{"+ops[1][1]+"}}");
 								return "{{"+ops[1][1]+"}}";
 						}
 						break;
@@ -351,7 +339,6 @@ var $gwxc=0;
 	grb=$gwrt(false);
 	function _r( node, attrname, opindex, env, scope, global ){
 		var o = {};
-		console.log(z[opindex]);
 		var a = grb( z[opindex], env, scope, global, o );
 		node.attr[attrname] = a;
 		if( o.is_affected ){node.n.push( attrname );}
