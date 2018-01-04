@@ -1,14 +1,36 @@
 
 var z=[];
+var global=new Object;
 var $gwxc=0;
+var e_ = {}
+if (typeof (global.entrys) === 'undefined') global.entrys = {};
+e_ = global.entrys;
+var d_ = {}
+if (typeof (global.defines) === 'undefined') global.defines = {};
+d_ = global.defines;
+var f_ = {}
+if (typeof (global.modules) === 'undefined') global.modules = {};
+f_ = global.modules;
+if (typeof (global.lastvalues) === 'undefined') global.lastvalues = [];
+if (typeof (global.newvalues) === 'undefined') global.newvalues = [];
+var p_ = {}
+var z = [];
+if (typeof (global.ops) === 'undefined') global.ops = [];
+z = global.ops;
+if (typeof (global.total_ops) === 'undefined') global.total_ops = 0;
+if (typeof (global.idx_st) === 'undefined') global.idx_st = {};
+if (typeof (global.idx_st.$gwx) === 'undefined') {
+	global.idx_st.$gwx = global.total_ops;}
+	var idx_st_ = global.idx_st.$gwx;
 	var root={"tag":"page"};
 	root.children=[]
 	function _(a,b){
 		b&&a.children.push(b);
 	}
 	function _v(k){
-		if(typeof(k)!='undefined')
-			{return {tag:'virtual','wxKey':k,children:[]};}
+		if(typeof(k)!='undefined'){
+			return {tag:'block','wx:for-items':k,children:[]};
+		}
 		return {tag:'virtual',children:[]};
 	}
 	function _n(tag){
@@ -50,13 +72,11 @@ var $gwxc=0;
 			var _a,_b,_c,_d, _aa, _bb;
 			switch( rop ){
 				case '?:':
-					//console.log(ops);
 					_a = rev( ops[1], e, s, g, o );
-					//console.log(_a);
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? rev( ops[2], e, s, g, o ) : rev( ops[3], e, s, g, o );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
-					return "{{"+rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","")+"?"+(rev( ops[2], e, s, g, o )!=""?rev( ops[2], e, s, g, o ):"''")+":"+(rev( ops[3], e, s, g, o )!=""?rev( ops[3], e, s, g, o ):"''")+"}}";
+					return "{{"+rev( ops[1], e, s, g, o ).replace("{{","").replace("}}","")+"?'"+rev( ops[2], e, s, g, o )+"':'"+rev( ops[3], e, s, g, o )+"'}}";
 					break;
 				case '&&':
 					_a = rev( ops[1], e, s, g, o );
@@ -199,6 +219,7 @@ var $gwxc=0;
 						break;
 					case 6:
 						_a = rev(ops[1],e,s,g,o);
+						return "{{"+rev(ops[1],e,s,g,o)+"."+rev(ops[2],e,s,g,o)+"}}";
 						_ta = wh.hn(_a)==='h';
 						_aa = _ta ? wh.rv(_a) : _a;
 						o.is_affected |= _ta;
@@ -358,7 +379,157 @@ var $gwxc=0;
 		}
 		return tmp;
 	}
+	function wfor(to_iter, func, env, _s, global, father, itemname, indexname, keyname, o) {
+		var _n = wh.hn(to_iter) === 'n';
+		var scope = wh.rv(_s);
+		var rscope = o.ap ? wh.rv(global.f) : scope;
+		var has_old_item = scope.hasOwnProperty(itemname);
+		var has_old_index = scope.hasOwnProperty(indexname);
+		var old_item = rscope[itemname];
+		var old_index = scope[indexname];
+		var full = Object.prototype.toString.call(wh.rv(to_iter));
+		var type = full[8];
+		if (type === 'N' && full[10] === 'l') type = 'X';
+		var _y;
+		if (_n) {
+			if (type === 'A') {
+				for (var i = 0; i < to_iter.length; i++) {
+					rscope[itemname] = o.ap ? function () {
+						return to_iter[i]
+					} : to_iter[i];
+					scope[indexname] = wh.nh(i, 'h');
+					_y = keyname ? (keyname === "*this" ? _v(wh.rv(to_iter[i])) : _v(wh.rv(wh.rv(to_iter[i])[keyname]))) : _v();
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'O') {
+				var i = 0;
+				for (var k in to_iter) {
+					rscope[itemname] = o.ap ? function () {
+						return to_iter[k]
+					} : to_iter[k];
+					scope[indexname] = wh.nh(k, 'h');
+					_y = keyname ? (keyname === "*this" ? _v(wh.rv(to_iter[k])) : _v(wh.rv(wh.rv(to_iter[k])[keyname]))) : _v();
+					_(father, _y);
+					global.valuekey = i + 1;
+					i++
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'S') {//to_iter.length
+				for (var i = 0; i < 1; i++) {
+					rscope[itemname] = o.ap ? function () {
+						return to_iter
+					} : to_iter;
+					scope[indexname] = wh.nh(i, 'h');//wx:key
+					_y = _v(to_iter);
+					_y["wx:key"]=keyname
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'N') {
+				for (var i = 0; i < to_iter; i++) {
+					rscope[itemname] = o.ap ? function () {
+						return i
+					} : i;
+					scope[indexname] = wh.nh(i, 'h');
+					_y = _v(i);
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else {}
+		} else {
+			var r_to_iter = wh.rv(to_iter);
+			var r_iter_item, iter_item;
+			if (type === 'A') {
+				for (var i = 0; i < r_to_iter.length; i++) {
+					iter_item = r_to_iter[i];
+					iter_item = wh.hn(iter_item) === 'n' ? wh.nh(iter_item, 'h') : iter_item;
+					r_iter_item = wh.rv(iter_item);
+					rscope[itemname] = o.ap ? function () {
+						return iter_item
+					} : iter_item
+					scope[indexname] = wh.nh(i, 'h');
+					_y = keyname ? (keyname === "*this" ? _v(r_iter_item) : _v(wh.rv(r_iter_item[keyname]))) : _v();
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'O') {
+				var i = 0;
+				for (var k in r_to_iter) {
+					iter_item = r_to_iter[k];
+					iter_item = wh.hn(iter_item) === 'n' ? wh.nh(iter_item, 'h') : iter_item;
+					r_iter_item = wh.rv(iter_item);
+					rscope[itemname] = o.ap ? function () {
+						return iter_item
+					} : iter_item;
+					scope[indexname] = wh.nh(k, 'h');
+					_y = keyname ? (keyname === "*this" ? _v(r_iter_item) : _v(wh.rv(r_iter_item[keyname]))) : _v();
+					_(father, _y);
+					global.valuekey = i + 1;
+					i++;
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'S') {
+				for (var i = 0; i < r_to_iter.length; i++) {
+					iter_item = wh.nh(r_to_iter[i], 'h');
+					rscope[itemname] = o.ap ? function () {
+						return iter_item
+					} : iter_item;
+					scope[indexname] = wh.nh(i, 'h');
+					_y = _v(to_iter[i] + i);
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else if (type === 'N') {
+				for (var i = 0; i < r_to_iter; i++) {
+					iter_item = wh.nh(i, 'h');
+					rscope[itemname] = o.ap ? function () {
+						return iter_item
+					} : iter_item;
+					scope[indexname] = wh.nh(i, 'h');
+					_y = _v(i);
+					_(father, _y);
+					global.valuekey = i + 1;
+					func(env, scope, _y, global);
+				}
+			} else {}
+		}
+		if (has_old_item) {
+			rscope[itemname] = old_item;
+		} else {
+			delete rscope[itemname];
+		}
+		if (has_old_index) {
+			scope[indexname] = old_index;
+		} else {
+			delete scope[indexname];
+		}
+		global.valuekey = 0;
+	}
+
 	function _o( opindex, env, scope, global ){
 		var nothing = {};
 		return grb( z[opindex], env, scope, global, nothing );
+	}
+
+	function _1(opindex, env, scope, global, o) {
+		var o = o || {};
+		global.opindex = opindex + idx_st_;
+		return gra(z[opindex + idx_st_], env, scope, global, o);
+	}
+
+	function _2(opindex, func, env, scope, global, father, itemname, indexname, keyname) {
+		var o = {};
+		var to_iter = _1(opindex, env, scope, global, o);
+		wfor(to_iter, func, env, scope, global, father, itemname, indexname, keyname, o);
+	}
+
+	function _gv() {
+		if (typeof (window.__webview_engine_version__) == 'undefined') return 0.0;
+		return window.__webview_engine_version__;
 	}
