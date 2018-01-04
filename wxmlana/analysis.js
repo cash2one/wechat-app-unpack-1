@@ -1,6 +1,7 @@
 
 var z=[];
 var $gwxc=0;
+//var should_pass_type_info=true;
 	var root={"tag":"page"};
 	root.children=[]
 	function _(a,b){
@@ -21,7 +22,8 @@ var $gwxc=0;
     
 	function $gwh(){
 		function x(){}
-		x.prototype = {hn: function( obj ){
+		x.prototype = {
+		hn: function( obj ){
 			if( typeof(obj) == 'object' ){
 				var cnt=0;
 				var any=false;
@@ -38,6 +40,7 @@ var $gwxc=0;
 			return { __value__: obj, __wxspec__: special ? special : true }
 		},
 		rv: function( obj ){
+			//console.log(this.hn(obj));
 			return this.hn(obj)==='n'?obj:this.rv(obj.__value__);
 		}}
 		return new x;
@@ -49,10 +52,13 @@ var $gwxc=0;
 			var _a,_b,_c,_d, _aa, _bb;
 			switch( rop ){
 				case '?:':
+					console.log(ops);
 					_a = rev( ops[1], e, s, g, o );
+					console.log(_a);
 					_c = should_pass_type_info && ( wh.hn(_a) === 'h' );
 					_d = wh.rv( _a ) ? rev( ops[2], e, s, g, o ) : rev( ops[3], e, s, g, o );
 					_d = _c && wh.hn( _d ) === 'n' ? wh.nh( _d, 'c' ) : _d;
+					console.log( rev( ops[2], e, s, g, o ));
 					return _d;
 					break;
 				case '&&':
@@ -168,12 +174,14 @@ var $gwxc=0;
 			}
 		}
 		function rev( ops, e, s, g, o ){
+			//console.log(ops);
 			var op = ops[0];
 			if( typeof(op)==='object' ){
 				var vop=op[0];
 				var _a, _aa, _b, _bb, _c, _d, _s, _e, _ta, _tb, _td;
 				switch(vop){
 					case 2:
+						console.log(ops);
 						return ArithmeticEv(ops,e,s,g,o);
 						break;
 					case 4:
@@ -237,32 +245,39 @@ var $gwxc=0;
 								o.is_affected |= wh.hn(g)==='h';
 								return g;
 							case 3:
-							_s = wh.rv( s );
-							_e = wh.rv( e );
-							_b = ops[1][1];
-							_a = _s && _s.hasOwnProperty(_b) ? s : _e && ( _e.hasOwnProperty(_b) ? e : undefined );
-							if( should_pass_type_info ){
-								if( _a ){
-									_ta = wh.hn(_a) === 'h';
-									_aa = _ta ? wh.rv( _a ) : _a;
-									_d = _aa[_b];
-									_td = wh.hn(_d) === 'h';
-									o.is_affected |= _ta || _td;
-									_d = _ta && !_td ? wh.nh(_d,'e') : _d;
-									return _d;
+								_s = wh.rv( s );
+								console.log(_s);
+								_e = wh.rv( e );
+								console.log(_e);
+								_b = ops[1][1];
+								//_a = _s && _s.hasOwnProperty(_b) ? s : _e && ( _e.hasOwnProperty(_b) ? e : undefined );
+								_a = _s;
+								if( should_pass_type_info ){
+									if( _a ){
+										_ta = wh.hn(_a) === 'h';
+										_aa = _ta ? wh.rv( _a ) : _a;
+										_d = _aa[_b];
+										_td = wh.hn(_d) === 'h';
+										o.is_affected |= _ta || _td;
+										_d = _ta && !_td ? wh.nh(_d,'e') : _d;
+										console.log(_d);
+										return _d;
+									}
 								}
-							}
-							else{
-								if( _a ){
-									_ta = wh.hn(_a) === 'h';
-									_aa = _ta ? wh.rv( _a ) : _a;
-									_d = _aa[_b];
-									_td = wh.hn(_d) === 'h';
-									o.is_affected |= _ta || _td;
-									return wh.rv(_d);
+								else{
+									if( _a ){
+										console.log(_a);
+										_ta = wh.hn(_a) === 'h';
+										_aa = _ta ? wh.rv( _a ) : _a;
+										_d = _aa[_b];
+										_td = wh.hn(_d) === 'h';
+										o.is_affected |= _ta || _td;
+										console.log(wh.rv(_d));
+										return wh.rv(_d);
+									}
 								}
-							}
-							return undefined;
+								console.log("{{"+ops[1][1]+"}}");
+								return "{{"+ops[1][1]+"}}";
 						}
 						break;
 					case 8:
@@ -336,6 +351,7 @@ var $gwxc=0;
 	grb=$gwrt(false);
 	function _r( node, attrname, opindex, env, scope, global ){
 		var o = {};
+		console.log(z[opindex]);
 		var a = grb( z[opindex], env, scope, global, o );
 		node.attr[attrname] = a;
 		if( o.is_affected ){node.n.push( attrname );}
